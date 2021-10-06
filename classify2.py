@@ -12,6 +12,7 @@ import random
 import argparse
 #os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin")
 import tflite_runtime.interpreter as tflite
+from tflite_runtime.interpreter import Interpreter
 
 def decode(characters, y):
     y = numpy.argmax(numpy.array(y), axis=2)[:,0]
