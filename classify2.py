@@ -52,31 +52,31 @@ def main():
 
     print("Classifying captchas with symbol set {" + captcha_symbols + "}")
 
-    with tflite.device('/cpu:0'):
-        with open(args.output, 'w') as output_file:
-            interpreter = tflite.Interpreter(model_path=args.model_name)
+    #with tflite.device('/cpu:0'):
+    with open(args.output, 'w') as output_file:
+        interpreter = tflite.Interpreter(model_path=args.model_name)
 
-            for x in os.listdir(args.captcha_dir):
-                # load image and preprocess it
-                interpreter.allocate_tensors()
-                input_details = interpreter.get_input_details()
-                output_details = interpreter.get_output_details()
-                raw_data = cv2.imread(os.path.join(args.captcha_dir, x))
-                rgb_data = cv2.cvtColor(raw_data, cv2.COLOR_BGR2RGB)
-                image = numpy.array(rgb_data) / 255.0
-                (c, h, w) = image.shape
-                image = image.reshape([-1, c, h, w])
-                image = numpy.float32(image)
-                interpreter.set_tensor(input_details[0]['index'], image)
-                out = ""
-                interpreter.invoke()
-                #procesa la imagen de una pero hay que sacarle caracter a caracter
-                for i in range(0,5):
-                    output_data = numpy.squeeze(interpreter.get_tensor(output_details[i]['index']))
-                    output = numpy.argmax(output_data)
-                    out = out + captcha_symbols[output]
+        for x in os.listdir(args.captcha_dir):
+            # load image and preprocess it
+            interpreter.allocate_tensors()
+            input_details = interpreter.get_input_details()
+            output_details = interpreter.get_output_details()
+            raw_data = cv2.imread(os.path.join(args.captcha_dir, x))
+            rgb_data = cv2.cvtColor(raw_data, cv2.COLOR_BGR2RGB)
+            image = numpy.array(rgb_data) / 255.0
+            (c, h, w) = image.shape
+            image = image.reshape([-1, c, h, w])
+            image = numpy.float32(image)
+            interpreter.set_tensor(input_details[0]['index'], image)
+            out = ""
+            interpreter.invoke()
+            #procesa la imagen de una pero hay que sacarle caracter a caracter
+            for i in range(0,5):
+                output_data = numpy.squeeze(interpreter.get_tensor(output_details[i]['index']))
+                output = numpy.argmax(output_data)
+                out = out + captcha_symbols[output]
 
-                output_file.write(x + "," + out)
-                output_file.write("\n")
+            output_file.write(x + "," + out)
+            output_file.write("\n")
 if __name__ == '__main__':
     main()
